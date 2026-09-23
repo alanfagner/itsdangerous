@@ -17,7 +17,8 @@ def test_want_bytes(value):
 def test_want_bytes_encodes_text_with_requested_encoding():
     value = "mañana"
     assert want_bytes(value, encoding="latin-1") == value.encode("latin-1")
-    assert want_bytes("mañana∞", encoding="latin-1", errors="ignore") == "mañana∞".encode(
+    lossy = "mañana∞"
+    assert want_bytes(lossy, encoding="latin-1", errors="ignore") == lossy.encode(
         "latin-1", "ignore"
     )
 
