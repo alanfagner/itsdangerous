@@ -17,7 +17,7 @@ def want_bytes(
     if isinstance(s, bytes):
         return s
 
-    raise TypeError("want_bytes() requires str or bytes")
+    raise TypeError(f"want_bytes() requires str or bytes, got {s!r}")
 
 
 def base64_encode(string: str | bytes) -> bytes:
