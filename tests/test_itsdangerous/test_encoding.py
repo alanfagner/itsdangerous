@@ -22,6 +22,11 @@ def test_want_bytes_encodes_text_with_requested_encoding():
     )
 
 
+def test_want_bytes_returns_bytes_unchanged():
+    value = b"tomorrow"
+    assert want_bytes(value) is value
+
+
 @pytest.mark.parametrize("value", ("無限", b"infinite"))
 def test_base64(value):
     enc = base64_encode(value)
