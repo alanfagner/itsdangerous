@@ -14,6 +14,14 @@ def test_want_bytes(value):
     assert isinstance(out, bytes)
 
 
+def test_want_bytes_encodes_text_with_requested_encoding():
+    value = "mañana"
+    assert want_bytes(value, encoding="latin-1") == value.encode("latin-1")
+    assert want_bytes("mañana∞", encoding="latin-1", errors="ignore") == "mañana∞".encode(
+        "latin-1", "ignore"
+    )
+
+
 @pytest.mark.parametrize("value", ("無限", b"infinite"))
 def test_base64(value):
     enc = base64_encode(value)
