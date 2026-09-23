@@ -33,6 +33,14 @@ def test_want_bytes_rejects_other_types(value):
         want_bytes(value)
 
 
+@pytest.mark.parametrize("value", (None, 42))
+def test_want_bytes_error_names_value(value):
+    with pytest.raises(TypeError) as info:
+        want_bytes(value)
+
+    assert repr(value) in str(info.value)
+
+
 @pytest.mark.parametrize("value", ("無限", b"infinite"))
 def test_base64(value):
     enc = base64_encode(value)
