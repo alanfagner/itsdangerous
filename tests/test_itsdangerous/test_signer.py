@@ -98,6 +98,14 @@ class TestSigner:
         with pytest.raises(ValueError):
             Signer(b"")
 
+    def test_empty_secret_key_message_names_cause(self):
+        with pytest.raises(ValueError) as exc_info:
+            Signer("")
+
+        message = str(exc_info.value)
+        assert "secret key" in message
+        assert "empty" in message
+
     def test_secret_keys(self):
         signer = Signer("a")
         signed = signer.sign("my string")
