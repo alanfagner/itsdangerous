@@ -91,6 +91,13 @@ class TestSigner:
         if algorithm is None:
             assert signer.algorithm.digest_method == signer.digest_method
 
+    def test_empty_secret_key_rejected(self):
+        with pytest.raises(ValueError):
+            Signer("")
+
+        with pytest.raises(ValueError):
+            Signer(b"")
+
     def test_secret_keys(self):
         signer = Signer("a")
         signed = signer.sign("my string")
