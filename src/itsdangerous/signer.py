@@ -128,9 +128,9 @@ class Signer:
     :param digest_method: Hash function to use when generating the HMAC
         signature. A value that is not callable is refused with a
         :exc:`TypeError` when the signer is constructed. Defaults to
-        :attr:`default_digest_method`, which
-        defaults to :func:`hashlib.sha1`. Note that the security of the
-        hash alone doesn't apply when used intermediately in HMAC.
+        :attr:`default_digest_method`, which defaults to
+        :func:`hashlib.sha1`. Note that the security of the hash alone
+        doesn't apply when used intermediately in HMAC.
     :param algorithm: A :class:`SigningAlgorithm` instance to use
         instead of building a default :class:`HMACAlgorithm` with the
         ``digest_method``.
