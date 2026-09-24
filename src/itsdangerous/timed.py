@@ -21,17 +21,22 @@ from .signer import Signer
 
 
 def _validate_max_age(max_age: t.Any) -> t.Any:
-    """Refuse a ``max_age`` that cannot express an age in seconds."""
     if max_age is None:
         return max_age
 
     if not isinstance(max_age, numbers.Real):
         raise TypeError(
-            f"max_age must be a real number or None, got {max_age!r}."
+            f"Invalid max_age {max_age!r}."
+            " It must be a real number, or None for no expiry."
         )
 
+    # NaN is the only real number unequal to itself, and it makes every
+    # age comparison false, silently disabling expiry.
     if max_age != max_age:
-        raise ValueError(f"max_age must not be NaN, got {max_age!r}.")
+        raise ValueError(
+            f"Invalid max_age {max_age!r}."
+            " It must not be NaN, or expiry would never apply."
+        )
 
     return max_age
 
