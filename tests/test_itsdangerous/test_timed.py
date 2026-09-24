@@ -103,6 +103,18 @@ class TestTimestampSigner(FreezeMixin, TestSigner):
         assert "max_age" in message
         assert "nan" in message
 
+    @pytest.mark.parametrize("max_age", ["10", b"10", [10], 10j, None.__class__])
+    def test_unsign_refuses_non_real_max_age(self, signer, max_age):
+        signed = signer.sign("value").replace(b"value", b"other", 1)
+
+        with pytest.raises(TypeError) as exc_info:
+            signer.unsign(signed, max_age=max_age)
+
+        message = str(exc_info.value)
+        assert "max_age" in message
+        assert repr(max_age) in message
+
+
 
 class TestTimedSerializer(FreezeMixin, TestSerializer):
     @pytest.fixture()
