@@ -5,6 +5,8 @@ Unreleased
 
 -   Drop support for Python 3.8 and 3.9.
 -   Remove previously deprecated code.
+-   Constructing a signer or serializer with an empty secret key raises a
+    ``ValueError`` instead of signing with a key derived from the salt alone.
 
 
 Version 2.2.0
