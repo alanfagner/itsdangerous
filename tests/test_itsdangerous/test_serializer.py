@@ -183,6 +183,15 @@ class TestSerializer:
             assert signer.digest_method == hashlib.sha256
 
 
+    def test_empty_secret_key_rejected_at_construction(self):
+        with pytest.raises(ValueError) as exc_info:
+            Serializer("")
+
+        message = str(exc_info.value)
+        assert "secret key" in message
+        assert "empty" in message
+
+
 def test_digests():
     factory = partial(Serializer, secret_key="dev key", salt="dev salt")
     default_value = factory(signer_kwargs={}).dumps([42])
