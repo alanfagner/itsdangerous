@@ -92,6 +92,17 @@ class TestTimestampSigner(FreezeMixin, TestSigner):
 
         assert isinstance(exc_info.value.date_signed, datetime)
 
+    def test_unsign_refuses_nan_max_age(self, signer, freeze):
+        signed = signer.sign("value")
+        freeze.tick(timedelta(seconds=3600))
+
+        with pytest.raises(ValueError) as exc_info:
+            signer.unsign(signed, max_age=float("nan"))
+
+        message = str(exc_info.value)
+        assert "max_age" in message
+        assert "nan" in message
+
 
 class TestTimedSerializer(FreezeMixin, TestSerializer):
     @pytest.fixture()
