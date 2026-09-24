@@ -115,6 +115,20 @@ class TestTimestampSigner(FreezeMixin, TestSigner):
         assert repr(max_age) in message
 
 
+    @pytest.mark.parametrize("max_age", [None, 0, 10, float("inf")])
+    def test_unsign_accepts_valid_max_age_values(self, signer, freeze, max_age):
+        signed = signer.sign("value")
+        assert signer.unsign(signed, max_age=max_age) == b"value"
+
+        freeze.tick(timedelta(seconds=3600))
+
+        if max_age is None or max_age == float("inf"):
+            assert signer.unsign(signed, max_age=max_age) == b"value"
+        else:
+            with pytest.raises(SignatureExpired):
+                signer.unsign(signed, max_age=max_age)
+
+
 
 class TestTimedSerializer(FreezeMixin, TestSerializer):
     @pytest.fixture()
