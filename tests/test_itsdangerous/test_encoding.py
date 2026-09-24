@@ -69,3 +69,14 @@ def test_int_bytes(value, expect):
 def test_base64_decode_rejects_out_of_alphabet(value):
     with pytest.raises(BadData):
         base64_decode(value)
+
+
+def test_base64_decode_text_bytes_parity_non_ascii():
+    text = "aGV\u221esbG8"
+    raw = text.encode("utf-8")
+
+    with pytest.raises(BadData):
+        base64_decode(raw)
+
+    with pytest.raises(BadData):
+        base64_decode(text)
