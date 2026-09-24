@@ -8,6 +8,7 @@ from .encoding import want_bytes
 from .exc import BadPayload
 from .exc import BadSignature
 from .signer import _make_keys_list
+from .signer import _validate_key_derivation
 from .signer import Signer
 
 if t.TYPE_CHECKING:
@@ -224,6 +225,9 @@ class Serializer(t.Generic[_TSerialized]):
 
         self.signer: type[Signer] = signer
         self.signer_kwargs: dict[str, t.Any] = signer_kwargs or {}
+
+        if "key_derivation" in self.signer_kwargs:
+            _validate_key_derivation(self.signer_kwargs["key_derivation"])
 
         if fallback_signers is None:
             fallback_signers = list(self.default_fallback_signers)

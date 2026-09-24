@@ -81,6 +81,20 @@ def _make_keys_list(
     return keys
 
 
+_KEY_DERIVATIONS = ("concat", "django-concat", "hmac", "none")
+
+
+def _validate_key_derivation(key_derivation: str) -> str:
+    if key_derivation not in _KEY_DERIVATIONS:
+        supported = ", ".join(repr(k) for k in _KEY_DERIVATIONS)
+        raise ValueError(
+            f"Unknown key derivation method {key_derivation!r}."
+            f" Supported methods are {supported}."
+        )
+
+    return key_derivation
+
+
 class Signer:
     """A signer securely signs bytes, then unsigns them to verify that
     the value hasn't been changed.
@@ -97,8 +111,10 @@ class Signer:
     :param sep: Separator between the signature and value.
     :param key_derivation: How to derive the signing key from the secret
         key and salt. Possible values are ``concat``, ``django-concat``,
-        or ``hmac``. Defaults to :attr:`default_key_derivation`, which
-        defaults to ``django-concat``.
+        ``hmac``, or ``none``. Any other value is refused with a
+        :exc:`ValueError` when the signer is constructed. Defaults to
+        :attr:`default_key_derivation`, which defaults to
+        ``django-concat``.
     :param digest_method: Hash function to use when generating the HMAC
         signature. Defaults to :attr:`default_digest_method`, which
         defaults to :func:`hashlib.sha1`. Note that the security of the
@@ -129,7 +145,9 @@ class Signer:
 
     #: The default scheme to use to derive the signing key from the
     #: secret key and salt. The default is ``django-concat``. Possible
-    #: values are ``concat``, ``django-concat``, and ``hmac``.
+    #: values are ``concat``, ``django-concat``, ``hmac``, and ``none``.
+    #: Any other value is refused with a :exc:`ValueError` when the
+    #: signer is constructed.
     #:
     #: .. versionadded:: 0.14
     default_key_derivation: str = "django-concat"
@@ -168,7 +186,7 @@ class Signer:
         if key_derivation is None:
             key_derivation = self.default_key_derivation
 
-        self.key_derivation: str = key_derivation
+        self.key_derivation: str = _validate_key_derivation(key_derivation)
 
         if digest_method is None:
             digest_method = self.default_digest_method
