@@ -33,6 +33,10 @@ def base64_decode(string: str | bytes) -> bytes:
     bytes.
     """
     string = want_bytes(string, encoding="ascii", errors="ignore")
+
+    if not set(string) <= set(_base64_alphabet):
+        raise BadData("Invalid base64-encoded data")
+
     string += b"=" * (-len(string) % 4)
 
     try:
