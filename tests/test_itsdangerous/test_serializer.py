@@ -142,6 +142,18 @@ class TestSerializer:
         assert other.loads(other.dumps(value)) == value
         assert other.dumps("value") != serializer.dumps("value")
 
+    def test_invalid_key_derivation_rejected_at_construction(
+        self, serializer_factory
+    ):
+        with pytest.raises(ValueError) as exc_info:
+            serializer_factory(signer_kwargs={"key_derivation": "invalid"})
+
+        message = str(exc_info.value)
+        assert "invalid" in message
+
+        for supported in ("concat", "django-concat", "hmac", "none"):
+            assert supported in message
+
     def test_serializer_kwargs(self, serializer_factory):
         serializer = serializer_factory(serializer_kwargs={"skipkeys": True})
 
