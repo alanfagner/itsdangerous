@@ -41,7 +41,7 @@ def base64_decode(string: str | bytes) -> bytes:
     except UnicodeEncodeError as e:
         raise BadData("Invalid base64-encoded data") from e
 
-    if not set(string) <= set(_base64_alphabet):
+    if not _base64_alphabet_set.issuperset(string):
         raise BadData("Invalid base64-encoded data")
 
     string += b"=" * (-len(string) % 4)
@@ -54,6 +54,7 @@ def base64_decode(string: str | bytes) -> bytes:
 
 # The alphabet used by base64.urlsafe_*
 _base64_alphabet = f"{string.ascii_letters}{string.digits}-_=".encode("ascii")
+_base64_alphabet_set = frozenset(_base64_alphabet)
 
 _int64_struct = struct.Struct(">Q")
 _int_to_bytes = _int64_struct.pack
