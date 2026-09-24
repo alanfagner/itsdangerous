@@ -46,6 +46,11 @@ specify environment variables.
     $ export SECRET_KEY="base64 encoded random bytes"
     $ python application.py
 
+If the environment variable is not set, ``SECRET_KEY`` is empty, and an
+empty secret key offers no protection at all. Constructing a signer or
+serializer with an empty secret key raises a ``ValueError``, so a missing
+key fails immediately instead of producing signatures anyone can forge.
+
 One way to generate a key is to use :func:`os.urandom`.
 
 .. code-block:: text

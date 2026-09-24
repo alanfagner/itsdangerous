@@ -8,6 +8,8 @@ Unreleased
 -   ``want_bytes`` raises ``TypeError`` for a value that is neither ``str`` nor
     ``bytes``, instead of returning it unchanged. The error message shows the
     value it received.
+-   Constructing a signer or serializer with an empty secret key raises a
+    ``ValueError`` instead of signing with a key derived from the salt alone.
 
 
 Version 2.2.0
