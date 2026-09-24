@@ -182,7 +182,6 @@ class TestSerializer:
         for signer in unsigners:
             assert signer.digest_method == hashlib.sha256
 
-
     def test_empty_secret_key_rejected_at_construction(self):
         with pytest.raises(ValueError) as exc_info:
             Serializer("")
