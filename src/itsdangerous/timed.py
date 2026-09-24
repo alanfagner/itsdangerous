@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import collections.abc as cabc
+import numbers
 import time
 import typing as t
 from datetime import datetime
@@ -23,6 +24,11 @@ def _validate_max_age(max_age: t.Any) -> t.Any:
     """Refuse a ``max_age`` that cannot express an age in seconds."""
     if max_age is None:
         return max_age
+
+    if not isinstance(max_age, numbers.Real):
+        raise TypeError(
+            f"max_age must be a real number or None, got {max_age!r}."
+        )
 
     if max_age != max_age:
         raise ValueError(f"max_age must not be NaN, got {max_age!r}.")
@@ -91,6 +97,11 @@ class TimestampSigner(Signer):
         the general behavior. If ``return_timestamp`` is ``True`` the
         timestamp of the signature will be returned as an aware
         :class:`datetime.datetime` object in UTC.
+
+        ``max_age`` must be a real number that is not NaN, or ``None``
+        for no expiry. Anything else is refused, with a ``TypeError`` or
+        a ``ValueError`` naming the value, before the signature is
+        checked.
 
         .. versionchanged:: 2.0
             The timestamp is returned as a timezone-aware ``datetime``
@@ -208,6 +219,11 @@ class TimedSerializer(Serializer[_TSerialized]):
         case the signature is outdated, :exc:`.SignatureExpired` is
         raised. All arguments are forwarded to the signer's
         :meth:`~TimestampSigner.unsign` method.
+
+        ``max_age`` must be a real number that is not NaN, or ``None``
+        for no expiry. Anything else is refused, with a ``TypeError`` or
+        a ``ValueError`` naming the value, before the signature is
+        checked.
         """
         s = want_bytes(s)
         last_exception = None
