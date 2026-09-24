@@ -5,6 +5,9 @@ Unreleased
 
 -   Drop support for Python 3.8 and 3.9.
 -   Remove previously deprecated code.
+-   ``want_bytes`` raises ``TypeError`` for a value that is neither ``str`` nor
+    ``bytes``, instead of returning it unchanged. The error message shows the
+    value it received.
 
 
 Version 2.2.0

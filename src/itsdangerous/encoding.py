@@ -12,9 +12,12 @@ def want_bytes(
     s: str | bytes, encoding: str = "utf-8", errors: str = "strict"
 ) -> bytes:
     if isinstance(s, str):
-        s = s.encode(encoding, errors)
+        return s.encode(encoding, errors)
 
-    return s
+    if isinstance(s, bytes):
+        return s
+
+    raise TypeError(f"want_bytes() requires str or bytes, got {s!r}")
 
 
 def base64_encode(string: str | bytes) -> bytes:
