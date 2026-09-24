@@ -10,6 +10,9 @@ Unreleased
     value it received.
 -   Constructing a signer or serializer with an empty secret key raises a
     ``ValueError`` instead of signing with a key derived from the salt alone.
+-   ``base64_decode`` raises ``BadData`` for a value containing a character
+    outside the URL-safe base64 alphabet, such as whitespace or non-ASCII text,
+    instead of silently dropping it.
 
 
 Version 2.2.0

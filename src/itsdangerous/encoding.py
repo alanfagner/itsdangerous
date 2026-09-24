@@ -31,8 +31,19 @@ def base64_encode(string: str | bytes) -> bytes:
 def base64_decode(string: str | bytes) -> bytes:
     """Base64 decode a URL-safe string of bytes or text. The result is
     bytes.
+
+    Raises :exc:`~itsdangerous.exc.BadData` if the value contains any
+    character outside the URL-safe base64 alphabet, including whitespace
+    and non-ASCII text. Such characters are not discarded.
     """
-    string = want_bytes(string, encoding="ascii", errors="ignore")
+    try:
+        string = want_bytes(string, encoding="ascii", errors="strict")
+    except UnicodeEncodeError as e:
+        raise BadData("Invalid base64-encoded data") from e
+
+    if not _base64_alphabet_set.issuperset(string):
+        raise BadData("Invalid base64-encoded data")
+
     string += b"=" * (-len(string) % 4)
 
     try:
@@ -43,6 +54,7 @@ def base64_decode(string: str | bytes) -> bytes:
 
 # The alphabet used by base64.urlsafe_*
 _base64_alphabet = f"{string.ascii_letters}{string.digits}-_=".encode("ascii")
+_base64_alphabet_set = frozenset(_base64_alphabet)
 
 _int64_struct = struct.Struct(">Q")
 _int_to_bytes = _int64_struct.pack
