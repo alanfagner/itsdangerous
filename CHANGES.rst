@@ -13,6 +13,9 @@ Unreleased
 -   ``base64_decode`` raises ``BadData`` for a value containing a character
     outside the URL-safe base64 alphabet, such as whitespace or non-ASCII text,
     instead of silently dropping it.
+-   Constructing a signer or serializer with an unsupported ``key_derivation``
+    raises a ``ValueError`` at construction, naming the value and the supported
+    methods, instead of raising ``TypeError`` at the first sign or unsign.
 
 
 Version 2.2.0
