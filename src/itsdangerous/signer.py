@@ -73,7 +73,10 @@ def _make_keys_list(
         keys = [want_bytes(s) for s in secret_key]  # pyright: ignore
 
     if not any(keys):
-        raise ValueError("secret key")
+        raise ValueError(
+            "The secret key is empty. A non-empty secret key is required"
+            " to sign and verify values."
+        )
 
     return keys
 
