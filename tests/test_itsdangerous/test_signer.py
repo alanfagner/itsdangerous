@@ -113,6 +113,11 @@ class TestSigner:
 
         assert Signer(["", "real-key"]).secret_key == b"real-key"
 
+    def test_non_empty_secret_key_output_unchanged(self):
+        signer = Signer("secret-key")
+        assert signer.secret_keys == [b"secret-key"]
+        assert signer.sign("my string") == b"my string.wh6tMHxLgJqB6oY1uT73iMlyrOA"
+
     def test_secret_keys(self):
         signer = Signer("a")
         signed = signer.sign("my string")
