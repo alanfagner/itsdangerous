@@ -106,6 +106,13 @@ class TestSigner:
         assert "secret key" in message
         assert "empty" in message
 
+    def test_key_collection_without_usable_secret_rejected(self):
+        for secret_key in ([], (), iter([]), ["", ""]):
+            with pytest.raises(ValueError):
+                Signer(secret_key)
+
+        assert Signer(["", "real-key"]).secret_key == b"real-key"
+
     def test_secret_keys(self):
         signer = Signer("a")
         signed = signer.sign("my string")
