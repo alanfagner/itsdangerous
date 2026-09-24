@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import collections.abc as cabc
+import numbers
 import time
 import typing as t
 from datetime import datetime
@@ -17,6 +18,27 @@ from .exc import SignatureExpired
 from .serializer import _TSerialized
 from .serializer import Serializer
 from .signer import Signer
+
+
+def _validate_max_age(max_age: t.Any) -> t.Any:
+    if max_age is None:
+        return max_age
+
+    if not isinstance(max_age, numbers.Real):
+        raise TypeError(
+            f"Invalid max_age {max_age!r}."
+            " It must be a real number, or None for no expiry."
+        )
+
+    # NaN is the only real number unequal to itself, and it makes every
+    # age comparison false, silently disabling expiry.
+    if max_age != max_age:
+        raise ValueError(
+            f"Invalid max_age {max_age!r}."
+            " It must not be NaN, or expiry would never apply."
+        )
+
+    return max_age
 
 
 class TimestampSigner(Signer):
@@ -81,10 +103,17 @@ class TimestampSigner(Signer):
         timestamp of the signature will be returned as an aware
         :class:`datetime.datetime` object in UTC.
 
+        ``max_age`` must be a real number that is not NaN, or ``None``
+        for no expiry. Anything else is refused, with a ``TypeError`` or
+        a ``ValueError`` naming the value, before the signature is
+        checked.
+
         .. versionchanged:: 2.0
             The timestamp is returned as a timezone-aware ``datetime``
             in UTC rather than a naive ``datetime`` assumed to be UTC.
         """
+        _validate_max_age(max_age)
+
         try:
             result = super().unsign(signed_value)
             sig_error = None
@@ -195,6 +224,11 @@ class TimedSerializer(Serializer[_TSerialized]):
         case the signature is outdated, :exc:`.SignatureExpired` is
         raised. All arguments are forwarded to the signer's
         :meth:`~TimestampSigner.unsign` method.
+
+        ``max_age`` must be a real number that is not NaN, or ``None``
+        for no expiry. Anything else is refused, with a ``TypeError`` or
+        a ``ValueError`` naming the value, before the signature is
+        checked.
         """
         s = want_bytes(s)
         last_exception = None

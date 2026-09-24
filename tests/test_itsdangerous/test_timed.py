@@ -92,6 +92,41 @@ class TestTimestampSigner(FreezeMixin, TestSigner):
 
         assert isinstance(exc_info.value.date_signed, datetime)
 
+    def test_unsign_refuses_nan_max_age(self, signer, freeze):
+        signed = signer.sign("value")
+        freeze.tick(timedelta(seconds=3600))
+
+        with pytest.raises(ValueError) as exc_info:
+            signer.unsign(signed, max_age=float("nan"))
+
+        message = str(exc_info.value)
+        assert "max_age" in message
+        assert "nan" in message
+
+    @pytest.mark.parametrize("max_age", ["10", b"10", [10], 10j, None.__class__])
+    def test_unsign_refuses_non_real_max_age(self, signer, max_age):
+        signed = signer.sign("value").replace(b"value", b"other", 1)
+
+        with pytest.raises(TypeError) as exc_info:
+            signer.unsign(signed, max_age=max_age)
+
+        message = str(exc_info.value)
+        assert "max_age" in message
+        assert repr(max_age) in message
+
+    @pytest.mark.parametrize("max_age", [None, 0, 10, float("inf")])
+    def test_unsign_accepts_valid_max_age_values(self, signer, freeze, max_age):
+        signed = signer.sign("value")
+        assert signer.unsign(signed, max_age=max_age) == b"value"
+
+        freeze.tick(timedelta(seconds=3600))
+
+        if max_age is None or max_age == float("inf"):
+            assert signer.unsign(signed, max_age=max_age) == b"value"
+        else:
+            with pytest.raises(SignatureExpired):
+                signer.unsign(signed, max_age=max_age)
+
 
 class TestTimedSerializer(FreezeMixin, TestSerializer):
     @pytest.fixture()
@@ -109,6 +144,21 @@ class TestTimedSerializer(FreezeMixin, TestSerializer):
 
         assert exc_info.value.date_signed == ts
         assert serializer.load_payload(exc_info.value.payload) == value
+
+    def test_loads_refuses_invalid_max_age(self, serializer, value):
+        signed = serializer.dumps(value)
+
+        with pytest.raises(ValueError) as nan_info:
+            serializer.loads(signed, max_age=float("nan"))
+
+        assert "max_age" in str(nan_info.value)
+        assert "nan" in str(nan_info.value)
+
+        with pytest.raises(TypeError) as type_info:
+            serializer.loads(signed, max_age="10")
+
+        assert "max_age" in str(type_info.value)
+        assert "'10'" in str(type_info.value)
 
     def test_return_payload(self, serializer, value, ts):
         signed = serializer.dumps(value)

@@ -16,6 +16,11 @@ Unreleased
 -   Constructing a signer or serializer with an unsupported ``key_derivation``
     raises a ``ValueError`` at construction, naming the value and the supported
     methods, instead of raising ``TypeError`` at the first sign or unsign.
+-   Passing a ``max_age`` that is NaN or not a real number to
+    ``TimestampSigner.unsign`` or ``TimedSerializer.loads`` raises a
+    ``ValueError`` or a ``TypeError`` naming the value, before the signature is
+    checked, instead of silently disabling expiry or failing inside the age
+    comparison. ``Decimal`` is no longer accepted; use ``int`` or ``float``.
 
 
 Version 2.2.0
