@@ -147,6 +147,21 @@ class TestTimedSerializer(FreezeMixin, TestSerializer):
         assert exc_info.value.date_signed == ts
         assert serializer.load_payload(exc_info.value.payload) == value
 
+    def test_loads_refuses_invalid_max_age(self, serializer, value):
+        signed = serializer.dumps(value)
+
+        with pytest.raises(ValueError) as nan_info:
+            serializer.loads(signed, max_age=float("nan"))
+
+        assert "max_age" in str(nan_info.value)
+        assert "nan" in str(nan_info.value)
+
+        with pytest.raises(TypeError) as type_info:
+            serializer.loads(signed, max_age="10")
+
+        assert "max_age" in str(type_info.value)
+        assert "'10'" in str(type_info.value)
+
     def test_return_payload(self, serializer, value, ts):
         signed = serializer.dumps(value)
         assert serializer.loads(signed, return_timestamp=True) == (value, ts)
