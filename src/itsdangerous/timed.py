@@ -19,6 +19,17 @@ from .serializer import Serializer
 from .signer import Signer
 
 
+def _validate_max_age(max_age: t.Any) -> t.Any:
+    """Refuse a ``max_age`` that cannot express an age in seconds."""
+    if max_age is None:
+        return max_age
+
+    if max_age != max_age:
+        raise ValueError(f"max_age must not be NaN, got {max_age!r}.")
+
+    return max_age
+
+
 class TimestampSigner(Signer):
     """Works like the regular :class:`.Signer` but also records the time
     of the signing and can be used to expire signatures. The
@@ -85,6 +96,8 @@ class TimestampSigner(Signer):
             The timestamp is returned as a timezone-aware ``datetime``
             in UTC rather than a naive ``datetime`` assumed to be UTC.
         """
+        _validate_max_age(max_age)
+
         try:
             result = super().unsign(signed_value)
             sig_error = None
