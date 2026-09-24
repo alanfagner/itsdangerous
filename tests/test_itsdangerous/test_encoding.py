@@ -14,6 +14,34 @@ def test_want_bytes(value):
     assert isinstance(out, bytes)
 
 
+def test_want_bytes_encodes_text_with_requested_encoding():
+    value = "mañana"
+    assert want_bytes(value, encoding="latin-1") == value.encode("latin-1")
+    lossy = "mañana∞"
+    assert want_bytes(lossy, encoding="latin-1", errors="ignore") == lossy.encode(
+        "latin-1", "ignore"
+    )
+
+
+def test_want_bytes_returns_bytes_unchanged():
+    value = b"tomorrow"
+    assert want_bytes(value) is value
+
+
+@pytest.mark.parametrize("value", (None, 42, ["a"], bytearray(b"x")))
+def test_want_bytes_rejects_other_types(value):
+    with pytest.raises(TypeError):
+        want_bytes(value)
+
+
+@pytest.mark.parametrize("value", (None, 42))
+def test_want_bytes_error_names_value(value):
+    with pytest.raises(TypeError) as info:
+        want_bytes(value)
+
+    assert repr(value) in str(info.value)
+
+
 @pytest.mark.parametrize("value", ("無限", b"infinite"))
 def test_base64(value):
     enc = base64_encode(value)
