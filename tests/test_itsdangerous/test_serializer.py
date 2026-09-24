@@ -152,6 +152,23 @@ class TestSerializer:
         for supported in ("concat", "django-concat", "hmac", "none"):
             assert supported in message
 
+    @pytest.mark.parametrize(
+        "digest_method", ("sha256", b"sha256", 42, hashlib.sha256())
+    )
+    def test_non_callable_digest_method_rejected(
+        self, serializer_factory, digest_method
+    ):
+        with pytest.raises(TypeError) as exc_info:
+            serializer_factory(signer_kwargs={"digest_method": digest_method})
+
+        message = str(exc_info.value)
+        assert "digest_method" in message
+        assert repr(digest_method) in message
+
+    def test_empty_signer_kwargs_still_constructs(self, serializer_factory):
+        serializer = serializer_factory(signer_kwargs={})
+        assert serializer.loads(serializer.dumps("value")) == "value"
+
     def test_serializer_kwargs(self, serializer_factory):
         serializer = serializer_factory(serializer_kwargs={"skipkeys": True})
 
