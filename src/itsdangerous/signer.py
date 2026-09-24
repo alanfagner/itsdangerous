@@ -68,9 +68,14 @@ def _make_keys_list(
     secret_key: str | bytes | cabc.Iterable[str] | cabc.Iterable[bytes],
 ) -> list[bytes]:
     if isinstance(secret_key, (str, bytes)):
-        return [want_bytes(secret_key)]
+        keys = [want_bytes(secret_key)]
+    else:
+        keys = [want_bytes(s) for s in secret_key]  # pyright: ignore
 
-    return [want_bytes(s) for s in secret_key]  # pyright: ignore
+    if not any(keys):
+        raise ValueError("secret key")
+
+    return keys
 
 
 class Signer:
