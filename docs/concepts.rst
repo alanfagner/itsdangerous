@@ -154,6 +154,9 @@ hash alone doesn't apply when used in HMAC.
 
 If a project considers SHA-1 a risk anyway, they can configure the
 signer with a different digest method such as :func:`hashlib.sha512`.
+The value must be the hash constructor itself, not the name of the
+algorithm: a ``digest_method`` that is not callable, such as the string
+``"sha512"``, is refused with a ``TypeError`` when the signer is built.
 A fallback signer for SHA-1 can be configured so that old tokens will be
 upgraded. SHA-512 produces a longer hash, so tokens will take up more
 space, which is relevant in cookies and URLs.

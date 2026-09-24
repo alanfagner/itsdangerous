@@ -21,6 +21,9 @@ Unreleased
     ``ValueError`` or a ``TypeError`` naming the value, before the signature is
     checked, instead of silently disabling expiry or failing inside the age
     comparison. ``Decimal`` is no longer accepted; use ``int`` or ``float``.
+-   Constructing a signer or serializer with a ``digest_method`` that is not
+    callable raises a ``TypeError`` at construction, naming the argument and the
+    value, instead of failing at the first sign or unsign.
 
 
 Version 2.2.0

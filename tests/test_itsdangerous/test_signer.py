@@ -85,6 +85,29 @@ class TestSigner:
         signer = signer_factory(digest_method=hashlib.md5)
         assert signer.unsign(signer.sign("value")) == b"value"
 
+    def test_digest_method_default_and_callable_still_construct(self, signer_factory):
+        default_signer = signer_factory()
+        assert callable(default_signer.digest_method)
+        assert default_signer.unsign(default_signer.sign("value")) == b"value"
+        assert Signer("secret-key").sign("my string") == (
+            b"my string.wh6tMHxLgJqB6oY1uT73iMlyrOA"
+        )
+
+        sha256_signer = signer_factory(digest_method=hashlib.sha256)
+        assert sha256_signer.digest_method is hashlib.sha256
+        assert sha256_signer.unsign(sha256_signer.sign("value")) == b"value"
+
+    @pytest.mark.parametrize(
+        "digest_method", ("sha256", b"sha256", 42, hashlib.sha256())
+    )
+    def test_non_callable_digest_method_rejected(self, signer_factory, digest_method):
+        with pytest.raises(TypeError) as exc_info:
+            signer_factory(digest_method=digest_method)
+
+        message = str(exc_info.value)
+        assert "digest_method" in message
+        assert repr(digest_method) in message
+
     @pytest.mark.parametrize(
         "algorithm", (None, NoneAlgorithm(), HMACAlgorithm(), _ReverseAlgorithm())
     )

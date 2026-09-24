@@ -8,6 +8,7 @@ from .encoding import want_bytes
 from .exc import BadPayload
 from .exc import BadSignature
 from .signer import _make_keys_list
+from .signer import _validate_digest_method
 from .signer import _validate_key_derivation
 from .signer import Signer
 
@@ -228,6 +229,9 @@ class Serializer(t.Generic[_TSerialized]):
 
         if "key_derivation" in self.signer_kwargs:
             _validate_key_derivation(self.signer_kwargs["key_derivation"])
+
+        if "digest_method" in self.signer_kwargs:
+            _validate_digest_method(self.signer_kwargs["digest_method"])
 
         if fallback_signers is None:
             fallback_signers = list(self.default_fallback_signers)
