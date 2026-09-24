@@ -63,3 +63,9 @@ def test_int_bytes(value, expect):
     assert enc == expect
     dec = bytes_to_int(enc)
     assert dec == value
+
+
+@pytest.mark.parametrize("value", (b"aGV*s b\nG8", "aGV*s b\nG8"))
+def test_base64_decode_rejects_out_of_alphabet(value):
+    with pytest.raises(BadData):
+        base64_decode(value)
