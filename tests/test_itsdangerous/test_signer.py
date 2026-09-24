@@ -88,7 +88,8 @@ class TestSigner:
     def test_digest_method_default_and_callable_still_construct(self, signer_factory):
         default_signer = signer_factory()
         assert callable(default_signer.digest_method)
-        assert default_signer.sign("my string") == (
+        assert default_signer.unsign(default_signer.sign("value")) == b"value"
+        assert Signer("secret-key").sign("my string") == (
             b"my string.wh6tMHxLgJqB6oY1uT73iMlyrOA"
         )
 
