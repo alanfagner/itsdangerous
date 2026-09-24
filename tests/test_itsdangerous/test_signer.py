@@ -72,10 +72,14 @@ class TestSigner:
         assert signer.unsign(signer.sign("value")) == b"value"
 
     def test_invalid_key_derivation(self, signer_factory):
-        signer = signer_factory(key_derivation="invalid")
+        with pytest.raises(ValueError) as exc_info:
+            signer_factory(key_derivation="invalid")
 
-        with pytest.raises(TypeError):
-            signer.derive_key()
+        message = str(exc_info.value)
+        assert "invalid" in message
+
+        for supported in ("concat", "django-concat", "hmac", "none"):
+            assert supported in message
 
     def test_digest_method(self, signer_factory):
         signer = signer_factory(digest_method=hashlib.md5)
