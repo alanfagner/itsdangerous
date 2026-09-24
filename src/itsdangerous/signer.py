@@ -95,6 +95,16 @@ def _validate_key_derivation(key_derivation: str) -> str:
     return key_derivation
 
 
+def _validate_digest_method(digest_method: t.Any) -> t.Any:
+    if not callable(digest_method):
+        raise TypeError(
+            f"The digest_method must be callable, got {digest_method!r}."
+            " Pass a hash constructor such as hashlib.sha256, not its name."
+        )
+
+    return digest_method
+
+
 class Signer:
     """A signer securely signs bytes, then unsigns them to verify that
     the value hasn't been changed.
@@ -116,7 +126,9 @@ class Signer:
         :attr:`default_key_derivation`, which defaults to
         ``django-concat``.
     :param digest_method: Hash function to use when generating the HMAC
-        signature. Defaults to :attr:`default_digest_method`, which
+        signature. A value that is not callable is refused with a
+        :exc:`TypeError` when the signer is constructed. Defaults to
+        :attr:`default_digest_method`, which
         defaults to :func:`hashlib.sha1`. Note that the security of the
         hash alone doesn't apply when used intermediately in HMAC.
     :param algorithm: A :class:`SigningAlgorithm` instance to use
@@ -191,7 +203,7 @@ class Signer:
         if digest_method is None:
             digest_method = self.default_digest_method
 
-        self.digest_method: t.Any = digest_method
+        self.digest_method: t.Any = _validate_digest_method(digest_method)
 
         if algorithm is None:
             algorithm = HMACAlgorithm(self.digest_method)
